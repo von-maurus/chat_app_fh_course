@@ -1,5 +1,5 @@
-import 'package:chat_app/common/custom_elevated_btn.dart';
-import 'package:chat_app/common/custom_input_widget.dart';
+import 'package:chat_app/common/widgets/custom_elevated_btn.dart';
+import 'package:chat_app/common/widgets/custom_input_widget.dart';
 import 'package:flutter/material.dart';
 
 class RegisterFormWidget extends StatelessWidget {

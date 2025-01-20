@@ -18,7 +18,7 @@ class LoginPage extends StatelessWidget {
             child: const Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                LogoWidget(title: 'Messegner'),
+                LogoWidget(title: 'Izi Messenger'),
                 LoginFormWidget(),
                 LabelsWidget(),
                 TermsAndConditions(),

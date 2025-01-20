@@ -16,6 +16,8 @@ class LogoWidget extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               title,
+              textAlign: TextAlign.center,
+              maxLines: 2,
               style: const TextStyle(fontSize: 30),
             )
           ],
