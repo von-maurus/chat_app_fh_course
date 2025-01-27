@@ -7,26 +7,28 @@ class CustomElevatedBtn extends StatelessWidget {
     this.height = 55,
     this.backgroundColor = Colors.blue,
     required this.onPressed,
+    this.disable = false,
   });
 
   final double height;
   final String text;
   final Color backgroundColor;
   final Function()? onPressed;
+  final bool disable;
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ButtonStyle(
         elevation: const WidgetStatePropertyAll(2),
         shape: const WidgetStatePropertyAll(StadiumBorder()),
-        backgroundColor: WidgetStatePropertyAll(backgroundColor),
+        backgroundColor: WidgetStatePropertyAll(disable ? Colors.grey[400] : backgroundColor),
       ),
       onPressed: onPressed,
       child: SizedBox(
         height: height,
         width: double.infinity,
         child: Center(
-          child: Text(text, style: const TextStyle(color: Colors.white)),
+          child: Text(text, style: TextStyle(color: disable ? Colors.black : Colors.white)),
         ),
       ),
     );
