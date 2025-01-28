@@ -11,7 +11,8 @@ class AuthProvider with ChangeNotifier {
   bool _isAuthenticating = false;
   String? get token => _token;
   bool get isAuthenticating => _isAuthenticating;
-  User? user;
+  User? get user => _user;
+  User? _user;
   final _storage = const FlutterSecureStorage();
 
   set authenticating(bool value) {
@@ -19,7 +20,12 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<String?> getToken() async {
+  set user(User? value) {
+    _user = value;
+    notifyListeners();
+  }
+
+  Future<String?> getToken() async {
     const storage = FlutterSecureStorage();
     return await storage.read(key: 'jwt');
   }
@@ -40,7 +46,7 @@ class AuthProvider with ChangeNotifier {
       final loginResponse = LoginResponse.fromJson(jsonDecode(response.body));
       user = loginResponse.user;
       // Save token
-      _saveToken(loginResponse.token);
+      await _saveToken(loginResponse.token);
       authenticating = false;
       return true;
     }
@@ -63,6 +69,8 @@ class AuthProvider with ChangeNotifier {
       Uri.parse('${Environment.apiUrl}/login/refresh'),
       headers: {'Content-Type': 'application/json', 'Authorization': '$_token'},
     );
+    final loginResponse = LoginResponse.fromJson(jsonDecode(response.body));
+    user = loginResponse.user;
     return response.statusCode == 200;
   }
 

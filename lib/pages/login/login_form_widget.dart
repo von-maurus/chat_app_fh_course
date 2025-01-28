@@ -3,6 +3,7 @@ import 'package:chat_app/common/widgets/custom_elevated_btn.dart';
 import 'package:chat_app/common/widgets/custom_input_widget.dart';
 import 'package:chat_app/pages/users/users_page.dart';
 import 'package:chat_app/services/auth_service.dart';
+import 'package:chat_app/services/socket_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context, listen: true);
+    final socket = Provider.of<SocketService>(context, listen: true);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -48,7 +50,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                     final res = await auth.login(emailCtrl.text.trim(), passwordCtrl.text.trim());
                     if (context.mounted) {
                       if (res) {
-                        // TODO: navegar y conectar a socket server
+                        await socket.connect();
                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UsersPage()));
                       } else {
                         showCustomDialog(

@@ -1,8 +1,11 @@
 import 'package:chat_app/common/utils/show_custom_dialog.dart';
+import 'package:chat_app/models/server_states.dart';
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/pages/login/login_page.dart';
 import 'package:chat_app/pages/users/user_list_tile.dart';
 import 'package:chat_app/services/auth_service.dart';
+import 'package:chat_app/services/socket_service.dart';
+import 'package:chat_app/services/users_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,11 +17,15 @@ class UsersPage extends StatefulWidget {
 }
 
 class _UsersPageState extends State<UsersPage> {
-  final users = [
-    User(uid: '1', name: 'Mariave', email: 'mariave@love.com', online: true),
-    User(uid: '1', name: 'Ely', email: 'ely@love.com', online: true),
-    User(uid: '1', name: 'Hector', email: 'hector@love.com', online: false),
-  ];
+  final usersService = UsersService();
+  List<User> users = [];
+
+  @override
+  void initState() {
+    _refreshUsers();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,11 +47,17 @@ class _UsersPageState extends State<UsersPage> {
   }
 
   Future<void> _refreshUsers() async {
-    await Future.delayed(const Duration(seconds: 1));
+    final resp = await usersService.getUsers();
+    if (resp.ok) {
+      setState(() {
+        users = resp.users!;
+      });
+    }
   }
 
   AppBar _buildAppBar() {
     final authService = Provider.of<AuthProvider>(context, listen: true);
+    final socket = Provider.of<SocketService>(context, listen: true);
     return AppBar(
       title: Text(
         authService.user?.name ?? '',
@@ -59,10 +72,9 @@ class _UsersPageState extends State<UsersPage> {
             title: 'Goodbye',
             subtitle: 'Are you sure you want to logout?',
             onPressed: () async {
+              socket.disconnect();
               await authService.logout();
-              if (context.mounted) {
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage()));
-              }
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage()));
             },
           );
         },
@@ -74,7 +86,9 @@ class _UsersPageState extends State<UsersPage> {
       actions: [
         Container(
           margin: const EdgeInsets.only(right: 10),
-          child: const Icon(Icons.check_circle, color: Colors.green),
+          child: socket.serverStates == ServerStates.online
+              ? const Icon(Icons.check_circle, color: Colors.green)
+              : const Icon(Icons.offline_bolt_outlined, color: Colors.red),
         )
       ],
     );
